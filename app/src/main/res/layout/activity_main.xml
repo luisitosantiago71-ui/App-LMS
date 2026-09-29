@@ -12,14 +12,14 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="20dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Mech Robotix"
             android:textColor="@color/brand"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
@@ -27,9 +27,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Aprende Lenguaje de Señas"
+            android:text="Aprende Lengua de Señas"
             android:textColor="@color/text_dark"
-            android:textSize="28sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <TextView
@@ -37,100 +37,49 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Conecta la app al guante robótico."
+            android:text="Practica el abecedario de LSM con apoyo visual y de movimiento."
             android:textColor="@color/text_muted"
-            android:textSize="15sp" />
+            android:textSize="14sp" />
 
         <LinearLayout
+            android:id="@+id/sensorContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             android:background="@drawable/bg_card"
-            android:elevation="4dp"
+            android:elevation="3dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Estado de conexión"
+                android:text="Conexión de sensores"
                 android:textColor="@color/text_dark"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Sin conexión. Presiona buscar para seleccionar el guante Bluetooth."
+                android:layout_marginTop="8dp"
+                android:text="Conecta los ESP32 para consultar los datos de cada mano. También puedes practicar sin conectarlos."
                 android:textColor="@color/text_muted"
-                android:textSize="15sp" />
-
-            <Button
-                android:id="@+id/btnLoadDevices"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="18dp"
-                android:background="@drawable/bg_button_primary"
-                android:text="Buscar guante Bluetooth"
-                android:textAllCaps="false"
-                android:textColor="@color/white" />
-
-            <Button
-                android:id="@+id/btnOpenBluetoothSettings"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_button_secondary"
-                android:text="Abrir ajustes Bluetooth"
-                android:textAllCaps="false"
-                android:textColor="@color/brand"
-                android:visibility="gone" />
-
-            <Spinner
-                android:id="@+id/spDevices"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="14dp" />
-
-            <Button
-                android:id="@+id/btnConnect"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_button_primary"
-                android:text="Conectar al guante"
-                android:textAllCaps="false"
-                android:textColor="@color/white" />
-
-            <Button
-                android:id="@+id/btnDisconnect"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_button_secondary"
-                android:text="Desconectar"
-                android:textAllCaps="false"
-                android:textColor="@color/brand" />
-
+                android:textSize="14sp" />
         </LinearLayout>
 
         <Button
             android:id="@+id/btnAlphabet"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_button_primary"
-            android:text="Ir al alfabeto"
-            android:textAllCaps="false"
-            android:textColor="@color/white" />
+            android:layout_height="54dp"
+            android:layout_marginTop="22dp"
+            android:text="Ir al abecedario" />
 
         <Button
-            android:id="@+id/btnPracticeCamera"
+            android:id="@+id/btnImageSigns"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Practicar con Cámara" />
+            android:layout_height="54dp"
+            android:layout_marginTop="10dp"
+            android:text="Mis señas con imágenes" />
 
     </LinearLayout>
-
 </ScrollView>

@@ -5,8 +5,8 @@ import android.graphics.*
 import android.view.View
 
 /** Solo muestra la mano observada: no dibuja rutas, objetivos ni siluetas de referencia. */
-class JPracticeView(context:Context):View(context) {
-    var engine:JPracticeEngine?=null
+class MotionHandOverlayView @JvmOverloads constructor(context:Context,attrs:android.util.AttributeSet?=null):View(context,attrs) {
+    var engine:LetterMotionEngine?=null
     private var live:JPracticeEngine.Sample?=null
     private var frameW=0
     private var frameH=0

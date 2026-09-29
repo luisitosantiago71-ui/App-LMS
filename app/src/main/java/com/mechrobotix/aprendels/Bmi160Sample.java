@@ -25,5 +25,15 @@ public final class Bmi160Sample {
             return new Bmi160Sample(seq,t,receivedMs,v);
         } catch(NumberFormatException e) {return null;}
     }
+    /** BLE BIN20 v1, little-endian: u32 seq, u32 ms, i16 ax ay az gx gy gz. */
+    public static Bmi160Sample parseBle(byte[] packet, long receivedMs) {
+        if(packet==null || packet.length!=20) return null;
+        java.nio.ByteBuffer b=java.nio.ByteBuffer.wrap(packet).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+        long seq=((long)b.getInt()) & 0xffffffffL;
+        long time=((long)b.getInt()) & 0xffffffffL;
+        double[] v=new double[6];
+        for(int i=0;i<6;i++) v[i]=b.getShort()/(i<3?16384.0:16.4);
+        return new Bmi160Sample(seq,time,receivedMs,v);
+    }
     public double accelerationNorm() { return Math.sqrt(ax*ax+ay*ay+az*az); }
 }

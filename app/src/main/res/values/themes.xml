@@ -2,9 +2,10 @@
 <resources>
 
     <style name="Theme.AprendeLS" parent="android:style/Theme.Material.Light.NoActionBar">
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:statusBarColor">@color/brand_dark</item>
-        <item name="android:navigationBarColor">@color/brand_dark</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowBackground">@color/background</item>
     </style>
 

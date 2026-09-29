@@ -2,7 +2,7 @@ package com.mechrobotix.aprendels
 
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarkerResult
 
-object JLandmarkSamples {
+object HandLandmarkSamples {
     fun sample(result:HandLandmarkerResult,w:Int,h:Int,front:Boolean):JPracticeEngine.Sample? {
         if(result.landmarks().size!=1) return null
         val p=result.landmarks()[0]

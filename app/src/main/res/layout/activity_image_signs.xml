@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+ android:id="@+id/imageSignsRoot" android:layout_width="match_parent" android:layout_height="match_parent"
+ android:background="@color/background" android:fillViewport="true">
+ <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="20dp" android:orientation="vertical">
+  <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mis señas con imágenes" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/text_dark" />
+  <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Prepara la imagen y revisa los puntos y la silueta. Después practica con cámara, espejo y ajustes de guía." android:textColor="@color/text_muted" android:paddingTop="8dp" android:paddingBottom="12dp" />
+  <Button android:id="@+id/newImageSign" android:layout_width="match_parent" android:layout_height="54dp" android:text="Preparar nueva imagen" />
+  <TextView android:id="@+id/imageSignsStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="12dp" android:textColor="@color/text_dark" />
+  <LinearLayout android:id="@+id/imageSignsList" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+  <Button android:id="@+id/backImageSigns" android:layout_width="match_parent" android:layout_height="52dp" android:text="Regresar" />
+ </LinearLayout>
+</ScrollView>

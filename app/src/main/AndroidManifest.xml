@@ -2,16 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Permisos Bluetooth para Android 11 o menor -->
-    <uses-permission
-        android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="30" />
-
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_ADMIN"
-        android:maxSdkVersion="30" />
-
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
     <!-- Permiso Bluetooth moderno para Android 12 o superior -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
 
     <!-- Permisos y características de la Cámara -->
     <uses-permission android:name="android.permission.CAMERA" />
@@ -33,14 +30,6 @@
         android:theme="@style/Theme.AprendeLS">
 
         <activity
-            android:name=".AlphabetActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".MotionPracticeActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".PracticeSignActivity"
             android:exported="false" />
 
@@ -55,8 +44,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".JReferenceEditorActivity" android:exported="false" />
-        <activity android:name=".JPracticeActivity" android:exported="false" />
+        <activity android:name=".ReferenceViewerActivity" android:exported="false" />
+        <activity android:name=".ImageSignsActivity" android:exported="false" />
+        <activity android:name=".ImageSignEditorActivity" android:configChanges="orientation|screenSize" android:exported="false" />
+        <activity android:name=".ImageSignPracticeActivity" android:exported="false" />
     </application>
 
 </manifest>

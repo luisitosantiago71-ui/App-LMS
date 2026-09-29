@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ android:id="@+id/imageEditorRoot" android:layout_width="match_parent" android:layout_height="match_parent"
+ android:orientation="vertical" android:background="@color/background" android:padding="12dp">
+ <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Preparar seña con imagen" android:textColor="@color/text_dark" android:textSize="22sp" android:textStyle="bold" />
+ <EditText android:id="@+id/signName" android:layout_width="match_parent" android:layout_height="48dp" android:hint="Nombre de la seña" android:inputType="textCapSentences" android:maxLength="80" android:singleLine="true" />
+ <FrameLayout android:id="@+id/mappingArea" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="#FFFFFF" android:minHeight="160dp" />
+ <ScrollView android:layout_width="match_parent" android:layout_height="260dp" android:fillViewport="true">
+  <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+   <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+    <Button android:id="@+id/importImage" android:layout_width="0dp" android:layout_height="52dp" android:layout_weight="1" android:text="Elegir imagen" />
+    <Button android:id="@+id/mapImage" android:layout_width="0dp" android:layout_height="52dp" android:layout_weight="1" android:layout_marginStart="6dp" android:text="Mapear" />
+   </LinearLayout>
+   <TextView android:id="@+id/mappingHint" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Carga una imagen con una sola mano completa." android:textColor="@color/text_dark" android:padding="8dp" />
+   <Switch android:id="@+id/traceOutline" android:layout_width="match_parent" android:layout_height="48dp" android:text="Trazar silueta a mano" android:textColor="@color/text_dark" />
+   <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+    <Button android:id="@+id/removePoint" android:layout_width="0dp" android:layout_height="52dp" android:layout_weight="1" android:text="Quitar último punto" />
+    <Button android:id="@+id/resetMapping" android:layout_width="0dp" android:layout_height="52dp" android:layout_weight="1" android:layout_marginStart="6dp" android:text="Restaurar mapeo" />
+   </LinearLayout>
+   <CheckBox android:id="@+id/pointsReviewed" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Revisé la posición de los 21 puntos" android:textColor="@color/text_dark" />
+   <CheckBox android:id="@+id/outlineReviewed" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Revisé que la silueta rodea correctamente la mano" android:textColor="@color/text_dark" />
+   <TextView android:id="@+id/imageEditorStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_dark" android:padding="8dp" android:accessibilityLiveRegion="polite" />
+  </LinearLayout>
+ </ScrollView>
+ <Button android:id="@+id/saveImageSign" android:layout_width="match_parent" android:layout_height="52dp" android:text="Guardar para practicar" android:enabled="false" />
+ <Button android:id="@+id/backImageEditor" android:layout_width="match_parent" android:layout_height="48dp" android:text="Regresar" />
+</LinearLayout>

@@ -2,7 +2,6 @@ package com.mechrobotix.aprendels
 
 import android.content.Context
 import android.util.AtomicFile
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.security.MessageDigest
@@ -12,9 +11,11 @@ object JReferenceStore {
     const val STEP_MS = 100L
     data class Frame(val timeMs:Long, val sample:JPracticeEngine.Sample?)
     data class Reference(val source:String, val frames:List<Frame>)
-    fun fingerprint(context:Context):String {
+    private val hashes=java.util.concurrent.ConcurrentHashMap<Int,String>()
+    fun fingerprint(context:Context,raw:Int=R.raw.letra_j):String {
+        hashes[raw]?.let { return it }
         val md=MessageDigest.getInstance("SHA-256")
-        context.resources.openRawResource(R.raw.letra_j).use { input ->
+        context.resources.openRawResource(raw).use { input ->
             val buffer=ByteArray(8192)
             while(true) { val n=input.read(buffer); if(n<0) break; md.update(buffer,0,n) }
         }
@@ -22,9 +23,16 @@ object JReferenceStore {
             val buffer=ByteArray(8192)
             while(true) { val n=input.read(buffer); if(n<0) break; md.update(buffer,0,n) }
         }
-        return md.digest().joinToString("") { "%02x".format(it.toInt() and 255) }
+        return md.digest().joinToString("") { "%02x".format(it.toInt() and 255) }.also { hashes[raw]=it }
     }
     private fun file(context:Context)=AtomicFile(File(context.filesDir,"j_reference_v1.json"))
+    /** Only pair an older mapping with the exact video/model used to create it. */
+    fun legacyVideoResource(context:Context):Int? = runCatching {
+        val af=file(context)
+        if(!af.baseFile.exists()) return@runCatching null
+        val source=JSONObject(af.openRead().bufferedReader().use { it.readText() }).getString("source")
+        listOf(R.raw.letra_j,R.raw.letra_j).firstOrNull { fingerprint(context,it)==source }
+    }.getOrNull()
     fun validate(frames:List<Frame>):List<JPracticeEngine.Sample> {
         require(frames.size>=12) { "Selecciona al menos 1.1 segundos de recorrido" }
         require(frames.zipWithNext().all { (a,b)->b.timeMs-a.timeMs in 1L..150L }) { "Hay huecos en la referencia" }
@@ -33,20 +41,6 @@ object JReferenceStore {
         require(samples.map { it.side }.distinct().size==1) { "La identificación de la mano cambia. Revisa el tramo" }
         JPracticeEngine(samples) // Comprueba también que exista recorrido.
         return samples
-    }
-    fun save(context:Context,source:String,frames:List<Frame>) {
-        validate(frames)
-        val rows=JSONArray()
-        frames.forEach { frame ->
-            val s=requireNotNull(frame.sample)
-            rows.put(JSONObject().put("t",frame.timeMs).put("side",s.side)
-                .put("p",JSONArray(s.points.map { JSONArray(it.toList()) }))
-                .put("f",JSONArray(s.flex.toList())))
-        }
-        val bytes=JSONObject().put("version",1).put("source",source).put("frames",rows).toString().toByteArray(Charsets.UTF_8)
-        val af=file(context); val stream=af.startWrite()
-        try { stream.write(bytes); af.finishWrite(stream) }
-        catch(e:Exception) { af.failWrite(stream); throw e }
     }
     fun load(context:Context,source:String):Reference? {
         val af=file(context)

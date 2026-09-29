@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PointF
 import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
-import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.math.abs
 import kotlin.math.hypot
@@ -15,18 +14,6 @@ data class ReferenceTemplate(
     val width: Int, val height: Int,
     val landmarks: List<NormalizedLandmark>, val outline: List<PointF>
 ) {
-    fun save(context: Context, letter: String) {
-        val json = JSONObject().put("width", width).put("height", height)
-        json.put("points", JSONArray().apply {
-            landmarks.forEach { put(JSONArray().put(it.x()).put(it.y()).put(it.z())) }
-        })
-        json.put("outline", JSONArray().apply {
-            outline.forEach { put(JSONArray().put(it.x).put(it.y)) }
-        })
-        context.getSharedPreferences("reference_templates_v2", Context.MODE_PRIVATE)
-            .edit().putString(letter, json.toString()).apply()
-    }
-
     companion object {
         fun load(context: Context, letter: String, width: Int, height: Int): ReferenceTemplate? =
             runCatching {

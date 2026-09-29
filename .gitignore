@@ -30,8 +30,3 @@ keystore.properties
 # Operating system files
 .DS_Store
 Thumbs.db
-
-# Configuración privada
-.env
-.env.*
-!.env.example

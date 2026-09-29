@@ -82,26 +82,6 @@ class HandOverlayView @JvmOverloads constructor(
         validated = false; tint = Color.RED; invalidate()
     }
 
-    /** Porcentaje visible del ancho de pantalla, compensando el zoom 1.30 del overlay. */
-    fun setGuideWidthPercent(percent: Int) {
-        guideWidthPercent = percent.coerceIn(15,60)
-        resetAttempt()
-    }
-
-    /**
-     * Gira juntos el contorno y los puntos objetivo. Llamar desde el hilo de interfaz.
-     * Ejemplo en la Activity: binding.overlayCanvasView.setGuideRotation(-15f)
-     * Si se cambia DURANTE una práctica, llamar también a resetValidation() en
-     * PracticeSignActivity para reiniciar su temporizador, mensaje y botón Siguiente.
-     */
-    fun setGuideRotation(degrees: Float) {
-        require(degrees.isFinite()) { "El ángulo debe ser finito" }
-        guideRotationDegrees = degrees % 360f
-        resetAttempt()
-    }
-
-    fun getGuideRotation(): Float = guideRotationDegrees
-
     /** Actualización conjunta desde los controles. Valores X/Y normalizados entre 0 y 1.
      * La Activity reinicia su temporizador y guarda los ajustes por letra.
      */

@@ -8,10 +8,11 @@ import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
 import kotlin.math.hypot
 
 /** Editor local: arrastrar articulaciones o volver a trazar el contorno en un solo gesto. */
-class ReferenceEditorView(context: Context, private val photo: Bitmap,
+class ImageMappingView(context: Context, private val photo: Bitmap,
                           private val original: ReferenceTemplate?) : View(context) {
     var tracing = false
         set(value) { field=value; selected=-1; invalidate() }
+    var onChanged: (() -> Unit)? = null
     var onHint: ((String)->Unit)? = null
     private val points=original?.landmarks?.map { PointF(it.x(),it.y()) }?.toMutableList() ?: mutableListOf<PointF>()
     private var outline=original?.outline?.map { PointF(it.x,it.y) } ?: emptyList()
@@ -46,14 +47,14 @@ class ReferenceEditorView(context: Context, private val photo: Bitmap,
 
     fun removeLastPoint() {
         if(points.isNotEmpty()) points.removeAt(points.lastIndex)
-        selected=-1; onHint?.invoke(instructions()); invalidate()
+        selected=-1; onChanged?.invoke(); onHint?.invoke(instructions()); invalidate()
     }
 
     fun resetDraft() {
         points.clear()
         original?.landmarks?.forEach { points.add(PointF(it.x(),it.y())) }
         outline=original?.outline?.map { PointF(it.x,it.y) } ?: emptyList()
-        draft.clear(); selected=-1; onHint?.invoke(instructions()); invalidate()
+        draft.clear(); selected=-1; onChanged?.invoke(); onHint?.invoke(instructions()); invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -85,7 +86,7 @@ class ReferenceEditorView(context: Context, private val photo: Bitmap,
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if(imageRect.isEmpty) return false
+        if(!isEnabled || imageRect.isEmpty) return false
         val p=PointF(((event.x-imageRect.left)/imageRect.width()).coerceIn(0f,1f),
             ((event.y-imageRect.top)/imageRect.height()).coerceIn(0f,1f))
         when(event.actionMasked) {
@@ -109,6 +110,7 @@ class ReferenceEditorView(context: Context, private val photo: Bitmap,
                 }
             }
             MotionEvent.ACTION_MOVE -> {
+                if(tracing || selected>=0) onChanged?.invoke()
                 if(tracing) {
                     val q=draft.lastOrNull()
                     if(q==null || hypot((q.x-p.x)*imageRect.width(),(q.y-p.y)*imageRect.height())>3f) draft.add(p)
@@ -116,17 +118,19 @@ class ReferenceEditorView(context: Context, private val photo: Bitmap,
             }
             MotionEvent.ACTION_UP -> {
                 if(tracing) {
-                    if(draft.size>=12) {
-                        outline=draft.map { PointF(it.x,it.y) }
+                    if(draft.size>=12 && hypot((draft.first().x-draft.last().x)*imageRect.width(),(draft.first().y-draft.last().y)*imageRect.height())<40f*resources.displayMetrics.density) {
+                        outline=draft.filterIndexed { i,_ -> i%maxOf(1,draft.size/500)==0 }.map { PointF(it.x,it.y) }
                         onHint?.invoke("Contorno trazado. Revisa antes de guardar.")
-                    } else onHint?.invoke("Trazo muy corto: se conservó el contorno anterior.")
+                    } else onHint?.invoke("Trazo corto o abierto: vuelve al inicio del contorno. Se conservó el anterior.")
                     draft.clear()
                 }
+                onChanged?.invoke()
                 if(!tracing) onHint?.invoke(instructions())
                 addedThisGesture=false
                 selected=-1; parent?.requestDisallowInterceptTouchEvent(false); performClick()
             }
             MotionEvent.ACTION_CANCEL -> {
+                onChanged?.invoke()
                 if(addedThisGesture && points.isNotEmpty()) points.removeAt(points.lastIndex)
                 addedThisGesture=false; draft.clear(); selected=-1
                 onHint?.invoke(instructions()); parent?.requestDisallowInterceptTouchEvent(false)
