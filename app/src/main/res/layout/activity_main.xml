@@ -37,9 +37,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Practica el abecedario de LSM con apoyo visual y de movimiento."
+            android:text="Elige un tema y aprende lengua de señas con ejemplos y práctica."
             android:textColor="@color/text_muted"
             android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnLearn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="22dp"
+            android:text="Aprender LMS" />
 
         <LinearLayout
             android:id="@+id/sensorContainer"
@@ -66,20 +73,6 @@
                 android:textColor="@color/text_muted"
                 android:textSize="14sp" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btnAlphabet"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="22dp"
-            android:text="Ir al abecedario" />
-
-        <Button
-            android:id="@+id/btnImageSigns"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="10dp"
-            android:text="Mis señas con imágenes" />
 
     </LinearLayout>
 </ScrollView>

@@ -46,11 +46,7 @@ class ReferenceViewerActivity:ComponentActivity() {
         if(uri==null) {
             area.addView(ImageView(this).apply {
                 scaleType=ImageView.ScaleType.FIT_CENTER; scaleX=mirror
-                val signId=intent.getStringExtra("sign_id")
-                if(signId==null) setImageResource(intent.getIntExtra("image",0))
-                else runCatching { ImageSignStore.load(this@ReferenceViewerActivity,signId) }
-                    .onSuccess { setImageURI(android.net.Uri.fromFile(it.image)) }
-                    .onFailure { Toast.makeText(this@ReferenceViewerActivity,"No se pudo abrir la imagen",Toast.LENGTH_LONG).show() }
+                setImageResource(intent.getIntExtra("image",0))
                 contentDescription="Referencia ampliada de $letter"
             },FrameLayout.LayoutParams(-1,-1))
         } else {

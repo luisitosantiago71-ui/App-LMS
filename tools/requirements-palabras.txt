@@ -1,0 +1,4 @@
+# Entorno aislado recomendado; Python 3.10–3.12.
+mediapipe==0.10.21
+opencv-contrib-python==4.11.0.86
+numpy==1.26.4

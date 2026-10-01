@@ -25,7 +25,7 @@ object AppUi {
             if(view is Button) {
                 val idName=runCatching { view.resources.getResourceEntryName(view.id) }.getOrDefault("")
                 val label=view.text?.toString()?.lowercase().orEmpty()
-                val primary=idName in setOf("btnAlphabet","btnNextSign","saveImageSign","newImageSign","btnPracticePreview","mapImage") ||
+                val primary=idName in setOf("btnLearn","btnAlphabet","btnNextSign","btnPracticePreview") ||
                     label.startsWith("practicar") || label.startsWith("guardar") || label.startsWith("siguiente") ||
                     label.startsWith("finalizar") || label.startsWith("mapear") || label.startsWith("buscar") ||
                     label.startsWith("conectar")

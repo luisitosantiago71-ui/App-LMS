@@ -30,3 +30,8 @@ keystore.properties
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Herramientas locales de preparación de palabras
+.venv-palabras/
+__pycache__/
+*.pyc

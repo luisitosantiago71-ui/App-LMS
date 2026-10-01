@@ -1,39 +1,21 @@
-# Aprende Lengua de Señas Mexicana
+# Aprende Lengua de Señas Mexicana — 1.6
 
-Aplicación Android para aprender el abecedario de LSM con referencias visuales y práctica mediante la cámara. La pantalla principal mantiene el panel de dos ESP32/BMI160 y ofrece accesos al abecedario y a Mis señas con imágenes.
+Práctica Android del abecedario y módulos de palabras mediante cámara y videos. La pantalla principal conserva el panel de dos ESP32/BMI160 y el botón **Aprender LMS**.
 
-## Funciones
+- Abecedario: 27 letras; J, K, Ñ, Q, X y Z conservan su motor dinámico.
+- Saludos y despedidas: diez videos, con referencias generadas automáticamente al abrir cada palabra.
+- Familia, Colores, Números y módulos nuevos: se habilitan al registrar sus lecciones en el catálogo.
 
-- Practicar las 27 letras del abecedario desde una sola pantalla.
-- Practicar J, K, Ñ, Q, X y Z con su video y validación por inicio, recorrido y postura final.
-- Elegir la tolerancia Precisa, Normal o Flexible; la app inicia en Flexible para facilitar la práctica.
-- Ampliar la referencia de la letra tocándola en la pantalla de práctica.
-- Guardar localmente las referencias de movimiento generadas a partir de los videos integrados. Las referencias que ya existan se mantienen.
-- Ajustar posición, tamaño, rotación y espejo de la guía por letra.
-- Conservar Mis señas con imágenes: importar, nombrar, mapear, revisar puntos y silueta, guardar y practicar.
-- Consultar datos de dos ESP32/BMI160. Los sensores son complementarios; la validación visual usa la cámara.
+## Flujo de videos
 
-## Código principal
+**Agregar/reemplazar MP4 en res/raw → registrar si es una palabra nueva → compilar e instalar → practicar.** La preparación se ejecuta en el teléfono. El hash del contenido permite regenerar solo la referencia que cambió; las otras se conservan. No necesitas Python, editores ni revisiones cuadro por cuadro.
 
-| Área | Archivos |
-| --- | --- |
-| Pantalla inicial y sensores | MainActivity, Bmi160Panel, Esp32BluetoothClient |
-| Práctica del abecedario | PracticeSignActivity, HandOverlayView, ReferenceTemplate |
-| Práctica de letras dinámicas | BundledMotionMapper, MotionReferenceStore, LetterMotionEngine, SequencePracticeEngine |
-| Trazado de mano de referencia | MotionHandOverlayView, HandLandmarkSamples |
-| Mis señas con imágenes | ImageSignEditorActivity, ImageSignStore, ImageSignsActivity |
-| Compatibilidad con referencias anteriores de J | JReferenceStore |
+Abre el proyecto en Android Studio y sincroniza Gradle. Se mantiene `com.mechrobotix.aprendels`, versión 1.6/código 7. Instala con la misma firma para conservar datos.
 
-JPracticeEngine conserva el detector de trayectoria particular de J y aporta los tipos compartidos de etapa, tolerancia y lectura de mano. JReferenceStore permite abrir referencias de J creadas por versiones anteriores. Las pantallas separadas para preparar movimientos se retiraron; los nombres históricos restantes no corresponden a opciones del menú.
+- [Guía de funcionamiento, archivos y tolerancias](GUIA_REFERENCIAS_AUTOMATICAS.md)
+- [Pruebas realizadas y comprobaciones pendientes](INFORME_REFERENCIAS_AUTOMATICAS.md)
+- [Instalación](LEEME_ACTUALIZACION.md)
 
-## Referencias dinámicas
+Tolerancias por palabra: `app/src/main/assets/word_lessons.json`. Valores generales: `app/src/main/java/com/mechrobotix/aprendels/WordTolerance.java`.
 
-La primera vez que se practica una letra dinámica sin referencia guardada, el teléfono analiza el video incluido y guarda una referencia en el almacenamiento privado de la app. La próxima vez se carga la referencia guardada. Este primer análisis puede tardar unos segundos.
-
-## Actualizar sin borrar información
-
-Abre el proyecto en Android Studio y ejecútalo sobre la aplicación existente. No desinstales la app ni borres sus datos. Para instalar un APK manual, compílalo con el mismo identificador de aplicación y la misma clave de firma de la versión instalada. Consulta LEEME_ACTUALIZACION.md.
-
-## Pruebas
-
-El proyecto incluye pruebas de las etapas del movimiento, espejo, tolerancias, pérdida de seguimiento, rechazos de intentos sin recorrido y flujo de demostración. Revisa la práctica en el teléfono para confirmar que la cámara reconoce de forma estable los videos integrados y la mano del usuario.
+El detector compara manos y movimiento con el ejemplo; no certifica el significado de LSM, expresiones faciales ni contacto con el cuerpo. El motor actual de palabras requiere movimiento. Los BMI160 siguen disponibles para consulta y no participan en la aprobación de palabras.

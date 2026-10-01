@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "modules": [
+    {
+      "id": "saludos_despedidas",
+      "title": "Saludos y despedidas",
+      "lessons": [
+        {
+          "id": "s_hola",
+          "title": "Hola",
+          "video": "s_hola",
+          "tolerance": {
+            "shape": 0.65
+          }
+        },
+        {
+          "id": "s_como_estas",
+          "title": "¿Cómo estás?",
+          "video": "s_como_estas",
+          "tolerance": {
+            "shape": 1.60,
+            "meanFlex": 95.0,
+            "maxFlex": 165.0,
+
+            "travel": 2.80,
+            "travelRelative": 0.80,
+
+            "minMotionRatio": 0.02,
+            "minMotion": 0.03,
+
+            "directionCosine": -0.80,
+            "minTravelProgress": 0.08,
+
+            "stability": 1.00,
+
+            "startHoldMs": 120,
+            "endHoldMs": 150,
+            "lostGraceMs": 2500
+          }
+        },
+        {
+          "id": "s_yo_bien",
+          "title": "Yo bien",
+          "video": "s_yo_bien",
+          "tolerance": {}
+        },
+        {
+          "id": "s_yo_mal",
+          "title": "Yo mal",
+          "video": "s_yo_mal",
+          "tolerance": {}
+        },
+        {
+          "id": "s_buenos_dias",
+          "title": "Buenos días",
+          "video": "s_buenos_dias",
+          "tolerance": {}
+        },
+        {
+          "id": "s_buenas_tardes",
+          "title": "Buenas tardes",
+          "video": "s_buenas_tardes",
+          "tolerance": {}
+        },
+        {
+          "id": "s_buenas_noches",
+          "title": "Buenas noches",
+          "video": "s_buenas_noches",
+          "tolerance": {}
+        },
+        {
+          "id": "d_nos_vemos_pronto",
+          "title": "Nos vemos pronto",
+          "video": "d_nos_vemos_pronto",
+          "tolerance": {}
+        },
+        {
+          "id": "d_nos_vemos_manana",
+          "title": "Nos vemos mañana",
+          "video": "d_nos_vemos_manana",
+          "tolerance": {}
+        },
+        {
+          "id": "d_nos_vemos_proxima",
+          "title": "Nos vemos la próxima",
+          "video": "d_nos_vemos_proxima",
+          "tolerance": {}
+        }
+      ]
+    },
+    {
+      "id": "familia",
+      "title": "Familia",
+      "lessons": []
+    },
+    {
+      "id": "colores",
+      "title": "Colores",
+      "lessons": []
+    },
+    {
+      "id": "numeros",
+      "title": "Números",
+      "lessons": []
+    }
+  ]
+}

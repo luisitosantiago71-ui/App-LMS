@@ -1,25 +1,13 @@
-# Actualización 1.4 · Aprende Lengua de Señas Mexicana
+# Actualización 1.6 — referencias automáticas
 
-## Qué cambió
+Base: AprendeLS_Modulos_Palabras(1).zip. Versión de aplicación 1.6, código 7.
 
-- La pantalla inicial usa fondo claro, tarjetas blancas, texto azul marino y botones azules separados.
-- El abecedario se practica en un solo flujo. Las letras J, K, Ñ, Q, X y Z muestran el video incluido y validan postura inicial, recorrido y postura final.
-- Las letras dinámicas empiezan con tolerancia Flexible; se pueden cambiar a Precisa o Normal en Ajustar guía.
-- Si la app encuentra una referencia guardada de una versión anterior, la carga. Si falta, genera una a partir del video integrado y la guarda localmente la primera vez que se abre esa letra.
-- Tocar la referencia permite ampliarla a pantalla completa.
-- Se quitaron las opciones de revisar/preparar letras en movimiento y la pantalla separada para ver el abecedario.
-- Mis señas con imágenes mantiene sus opciones y datos.
+1. Descomprime esta entrega en una carpeta nueva y abre AprendeLenguajeDeSenas en Android Studio.
+2. Configura el SDK local y sincroniza Gradle.
+3. Compila e instala sobre la app existente con la misma firma. No es necesario desinstalar ni borrar datos.
+4. Abre Aprender LMS → Saludos y despedidas. La primera apertura de cada palabra prepara su referencia automáticamente y muestra el progreso en la pantalla de práctica.
+5. Las siguientes aperturas reutilizan la referencia. Si sustituyes el MP4 y vuelves a compilar e instalar, esa palabra se prepara otra vez.
 
-## Instalar como actualización
+Esta primera actualización al generador automático crea nuevas cachés de palabras. Los antiguos JSON en assets se conservan exclusivamente como datos históricos de pruebas y no se cargan en la práctica. No ejecutes preparar_palabras.py para publicar videos: ya no es necesario.
 
-1. Abre la carpeta AprendeLenguajeDeSenas en Android Studio.
-2. Ejecuta la app sobre la instalación existente.
-3. No la desinstales y no borres los datos de la aplicación.
-
-El proyecto conserva el identificador com.mechrobotix.aprendels y sube versionCode de 4 a 5. Para instalar un APK manual, debe firmarse con la misma clave de la versión anterior. Si Android rechaza la actualización por una firma distinta, instala usando la clave de publicación original; no borres los datos como primer paso.
-
-## Primer uso de una letra dinámica
-
-Al abrir por primera vez J, K, Ñ, Q, X o Z sin una referencia existente, espera mientras aparece “Preparando demostración”. El análisis del video ocurre en el teléfono y la app conserva el resultado para usos posteriores. Si el mapeo no encuentra suficientes cuadros válidos, mostrará un mensaje indicando que no pudo preparar esa referencia.
-
-
+La guía completa está en GUIA_REFERENCIAS_AUTOMATICAS.md. Consulta INFORME_REFERENCIAS_AUTOMATICAS.md: los controles Java y las reproducciones de detecciones pasaron, pero no se pudo compilar un APK ni ejecutar la prueba Android aquí porque la descarga de Gradle está bloqueada.

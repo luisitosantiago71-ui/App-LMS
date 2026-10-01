@@ -45,9 +45,8 @@
         </activity>
 
         <activity android:name=".ReferenceViewerActivity" android:exported="false" />
-        <activity android:name=".ImageSignsActivity" android:exported="false" />
-        <activity android:name=".ImageSignEditorActivity" android:configChanges="orientation|screenSize" android:exported="false" />
-        <activity android:name=".ImageSignPracticeActivity" android:exported="false" />
+        <activity android:name=".LearningModulesActivity" android:exported="false" />
+        <activity android:name=".WordPracticeActivity" android:exported="false" />
     </application>
 
 </manifest>

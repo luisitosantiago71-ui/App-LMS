@@ -22,8 +22,7 @@ import com.mechrobotix.aprendels.databinding.ActivityPracticeSignBinding
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executors
 
-open class PracticeSignActivity : ComponentActivity() {
-    protected open val customImagePractice=false
+class PracticeSignActivity : ComponentActivity() {
     private lateinit var binding: ActivityPracticeSignBinding
     private val cameraExecutor = Executors.newSingleThreadExecutor()
     private var handLandmarker: HandLandmarker? = null // Solo se usa en cameraExecutor.
@@ -41,7 +40,7 @@ open class PracticeSignActivity : ComponentActivity() {
     private var reviewing = false
     private var resizing = false
     private var guideMirrored = false
-    private val guidePreferences by lazy { getSharedPreferences(if(customImagePractice) "image_sign_guides_v1" else "guide_transform_v3", MODE_PRIVATE) }
+    private val guidePreferences by lazy { getSharedPreferences("guide_transform_v3", MODE_PRIVATE) }
     private val legacySizePreferences by lazy { getSharedPreferences("guide_size_v2", MODE_PRIVATE) }
 
     @Volatile private var motionMode=false
@@ -75,7 +74,7 @@ open class PracticeSignActivity : ComponentActivity() {
         }
     }
 
-    private data class Lesson(val letter:String,val image:Int,val id:String=letter,val custom:ImageSignStore.Sign?=null)
+    private data class Lesson(val letter:String,val image:Int,val id:String=letter)
     // Las letras en movimiento usan su video y evaluador de secuencias.
     private var lessons = listOf(
         Lesson("A", R.drawable.sign_a),
@@ -107,7 +106,7 @@ open class PracticeSignActivity : ComponentActivity() {
         Lesson("Z", R.drawable.sign_z)
     )
 
-    private fun isDynamic(lesson:Lesson)=!customImagePractice && MotionReferenceStore.isDynamic(lesson.letter)
+    private fun isDynamic(lesson:Lesson)=MotionReferenceStore.isDynamic(lesson.letter)
 
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -130,16 +129,8 @@ open class PracticeSignActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if(customImagePractice) {
-            setContentView(R.layout.activity_image_sign_practice)
-            binding=ActivityPracticeSignBinding.bind(findViewById(R.id.imagePracticeContent))
-            lessons=ImageSignStore.ids(this).mapNotNull { id -> runCatching { ImageSignStore.load(this,id) }.getOrNull() }
-                .sortedBy { it.name.lowercase() }.map { Lesson(it.name,0,it.id,it) }
-            if(lessons.isEmpty()) { Toast.makeText(this,"Guarda primero una imagen revisada",Toast.LENGTH_LONG).show();finish();return }
-        } else {
-            binding=ActivityPracticeSignBinding.inflate(layoutInflater)
-            setContentView(binding.root)
-        }
+        binding=ActivityPracticeSignBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         if(lessons.isEmpty()) { finish();return }
         AppUi.styleButtons(binding.root)
         binding.motionOverlayView.scaleX=1.30f;binding.motionOverlayView.scaleY=1.30f
@@ -147,7 +138,7 @@ open class PracticeSignActivity : ComponentActivity() {
             val lesson=lessons[lessonIndex]
             if(isDynamic(lesson)) { playMotionDemo();return@setOnClickListener }
             startActivity(android.content.Intent(this,ReferenceViewerActivity::class.java)
-                .putExtra("letter",lesson.letter).putExtra("image",lesson.image).putExtra("sign_id",lesson.custom?.id)
+                .putExtra("letter",lesson.letter).putExtra("image",lesson.image)
                 .putExtra("video",isDynamic(lesson) && MotionReferenceStore.uri(this,lesson.letter)!=null)
                 .putExtra("mirror",guideMirrored))
         }
@@ -171,7 +162,7 @@ open class PracticeSignActivity : ComponentActivity() {
             }
         }
         val selectedLetter = savedInstanceState?.getString("practice_letter")
-            ?: intent.getStringExtra(if(customImagePractice) "sign_id" else "letter")
+            ?: intent.getStringExtra("letter")
             ?: guidePreferences.getString("last_practice_letter", "A")
         lessonIndex = lessons.indexOfFirst { it.id == selectedLetter }.coerceAtLeast(0)
         setupGuideControls()
@@ -201,7 +192,7 @@ open class PracticeSignActivity : ComponentActivity() {
         val token = ++generation
         session++ // Descarta resultados pendientes de la letra anterior.
         guidePreferences.edit().putString("last_practice_letter", lesson.id).apply()
-        binding.btnChooseLetter.text = if(customImagePractice) "Elegir seña: ${lesson.letter}" else "Elegir letra: ${lesson.letter}"
+        binding.btnChooseLetter.text = "Elegir letra: ${lesson.letter}"
         restoreGuideControls()
         ready = false; completed = false; holdingSince = 0L; previousFrame = 0L
         binding.root.removeCallbacks(frameTimeout)
@@ -215,8 +206,7 @@ open class PracticeSignActivity : ComponentActivity() {
         binding.videoSignReference.visibility=View.GONE
         binding.ivSignReference.visibility=View.VISIBLE
         binding.referenceTap.text="Ampliar"
-        if(lesson.custom==null) binding.ivSignReference.setImageResource(lesson.image)
-        else binding.ivSignReference.setImageURI(android.net.Uri.fromFile(lesson.custom.image))
+        binding.ivSignReference.setImageResource(lesson.image)
         binding.ivSignReference.contentDescription = "Referencia de la letra ${lesson.letter}"
         binding.tvInstruction.text = "Haz la seña: ${lesson.letter}"
         binding.tvMatchStatus.text = "Preparando la guía…"
@@ -229,7 +219,7 @@ open class PracticeSignActivity : ComponentActivity() {
         }
         cameraExecutor.execute {
             try {
-                val template=lesson.custom?.template ?: run {
+                val template=run {
                     val bitmap=decodeReference(lesson.image)
                     try { prepareTemplate(lesson.letter,bitmap) } finally { bitmap.recycle() }
                 }
@@ -267,10 +257,11 @@ open class PracticeSignActivity : ComponentActivity() {
         binding.tvMatchStatus.text="Cargando la referencia de movimiento…"
         cameraExecutor.execute {
             try {
-                // Reusa una referencia guardada; si no existe, la crea desde el video incluido.
-                val saved=runCatching { MotionReferenceStore.load(this,letter) }.getOrNull()
+                // El mismo nombre raw puede tener bytes nuevos después de actualizar la app.
+                val source=JReferenceStore.fingerprint(this,MotionReferenceStore.bundled(letter))
+                val saved=runCatching { MotionReferenceStore.load(this,letter) }.getOrNull()?.takeIf{it.source==source}
                 if(saved==null) runOnUiThread { if(!closing && token==generation)
-                    binding.tvMatchStatus.text="Analizando el video de $letter por primera vez. La referencia se guardará automáticamente…" }
+                    binding.tvMatchStatus.text="Analizando el video de $letter actualizado. La referencia se guardará automáticamente…" }
                 val stored=saved ?: BundledMotionMapper.prepare(this,letter)
                 val engine=LetterMotionEngine(letter,MotionReferenceStore.validate(stored.frames,letter))
                 val uri=android.net.Uri.fromFile(stored.video)
@@ -536,7 +527,7 @@ open class PracticeSignActivity : ComponentActivity() {
         if(reviewing) return
         reviewing=true
         resetValidation()
-        AlertDialog.Builder(this).setTitle(if(customImagePractice) "Elige una seña para practicar" else "Elige una letra para practicar")
+        AlertDialog.Builder(this).setTitle("Elige una letra para practicar")
             .setSingleChoiceItems(lessons.map { it.letter }.toTypedArray(),lessonIndex) { dialog,index ->
                 lessonIndex=index
                 resizing=false

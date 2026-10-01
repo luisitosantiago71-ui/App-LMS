@@ -18,8 +18,7 @@ class MainActivity:ComponentActivity() {
         super.onCreate(savedInstanceState);b=ActivityMainBinding.inflate(layoutInflater);setContentView(b.root);AppUi.insets(b.root)
         sensors=Bmi160Panel(this) { if(Build.VERSION.SDK_INT>=31) permission.launch(Manifest.permission.BLUETOOTH_CONNECT) else sensors.permissionResult(true) }
         sensors.attachInline(b.sensorContainer)
-        b.btnAlphabet.setOnClickListener { startActivity(Intent(this,PracticeSignActivity::class.java)) }
-        b.btnImageSigns.setOnClickListener { startActivity(Intent(this,ImageSignsActivity::class.java)) }
+        b.btnLearn.setOnClickListener { startActivity(Intent(this,LearningModulesActivity::class.java)) }
         AppUi.styleButtons(b.root)
     }
     override fun onResume() { super.onResume();sensors.resume() }

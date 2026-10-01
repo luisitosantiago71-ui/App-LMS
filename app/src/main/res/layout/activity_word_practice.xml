@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="#000000">
+    <androidx.camera.view.PreviewView android:id="@+id/wordCamera"
+        android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+    <LinearLayout android:id="@+id/wordHeader" android:layout_width="0dp" android:layout_height="wrap_content"
+        android:orientation="vertical" android:paddingHorizontal="12dp" android:paddingVertical="8dp"
+        android:background="#DC000000" app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <TextView android:id="@+id/wordTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Haz la seña: Hola" android:textColor="#FFFFFF" android:textSize="20sp"
+            android:textStyle="bold" android:gravity="center" />
+        <TextView android:id="@+id/wordCounter" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Saludos y despedidas · 1/10" android:textColor="#DDFFFFFF" android:textSize="12sp" android:gravity="center" />
+        <ProgressBar android:id="@+id/wordProgress" style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent" android:layout_height="4dp" android:layout_marginTop="6dp"
+            android:max="100" android:progressTint="#42A5F5" android:progressBackgroundTint="#44FFFFFF" />
+    </LinearLayout>
+    <!-- Referencia compacta; el resto de la pantalla queda para cámara, brazos y manos. -->
+    <FrameLayout android:id="@+id/wordVideoArea" android:layout_width="0dp" android:layout_height="0dp"
+        android:layout_marginTop="8dp" android:layout_marginEnd="10dp"
+        app:layout_constraintWidth_percent="0.40" app:layout_constraintWidth_max="180dp"
+        app:layout_constraintDimensionRatio="1:1" app:layout_constraintTop_toBottomOf="@id/wordHeader"
+        app:layout_constraintEnd_toEndOf="parent">
+        <VideoView android:id="@+id/wordVideo" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:layout_gravity="center" android:contentDescription="Video de ejemplo de la palabra" />
+        <TextView android:id="@+id/wordReplay" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:layout_gravity="bottom" android:gravity="bottom|center_horizontal" android:paddingBottom="3dp" android:text="Repetir ejemplo"
+            android:textColor="#FFFFFF" android:textSize="11sp" android:background="@android:color/transparent"
+            android:shadowColor="#000000" android:shadowRadius="8"
+            android:clickable="true" android:focusable="true" android:contentDescription="Repetir el video e iniciar otro intento" />
+    </FrameLayout>
+    <TextView android:id="@+id/wordStatus" android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp" android:layout_marginBottom="8dp" android:padding="10dp"
+        android:text="Preparando la práctica…" android:textColor="#FFFFFF" android:textSize="17sp"
+        android:gravity="center" android:background="#B8000000" android:accessibilityLiveRegion="polite"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/wordBottom" />
+    <LinearLayout android:id="@+id/wordBottom" android:layout_width="0dp" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:padding="8dp" android:background="#DC000000"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <Button android:id="@+id/wordBack" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1"
+            android:text="Regresar" android:textAllCaps="false" android:textColor="#FFFFFF" android:backgroundTint="#CC202020"
+            android:stateListAnimator="@null" android:elevation="0dp" />
+        <Button android:id="@+id/wordNext" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1"
+            android:layout_marginStart="8dp" android:text="Siguiente" android:enabled="false" android:textAllCaps="false"
+            android:textColor="#FFFFFF" android:backgroundTint="#CC303030" android:stateListAnimator="@null" android:elevation="0dp" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

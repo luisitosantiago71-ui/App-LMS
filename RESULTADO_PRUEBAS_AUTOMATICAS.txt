@@ -1,0 +1,12 @@
+d_nos_vemos_manana.txt: 11 hitos, 300–6700 ms; gap=100
+d_nos_vemos_pronto.txt: 12 hitos, 1100–7000 ms; gap=100
+d_nos_vemos_proxima.txt: 12 hitos, 500–6200 ms; gap=200
+s_buenas_noches.txt: 11 hitos, 0–6100 ms; gap=200
+s_buenas_tardes.txt: 13 hitos, 0–5600 ms; gap=100
+s_buenos_dias.txt: 10 hitos, 0–4300 ms; gap=100
+s_como_estas.txt: 12 hitos, 1200–6700 ms; gap=200
+s_hola.txt: 7 hitos, 0–3000 ms; gap=100
+s_yo_bien.txt: 7 hitos, 700–4100 ms; gap=100
+s_yo_mal.txt: 7 hitos, 300–3600 ms; gap=100
+PASS: controles de calidad del generador.
+d_nos_vemos_manana.txt: SUCCESS key=10/10 ¡Palabra completada!
