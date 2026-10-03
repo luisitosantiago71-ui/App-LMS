@@ -39,6 +39,8 @@ class WordPracticeActivity:ComponentActivity() {
     @Volatile private var ready=false
     @Volatile private var generation=0
     @Volatile private var session=0
+    @Volatile private var debugOn=false
+    private var dropped=0 // frames descartados por llegar tarde (>600 ms)
     private var preparing=false
     private var videoReady=false
     private var cameraReady=false
@@ -57,6 +59,7 @@ class WordPracticeActivity:ComponentActivity() {
             }
             if(ready && videoReady && cameraReady && !completed && SystemClock.elapsedRealtime()-lastResult>600){
                 engine?.missing(SystemClock.elapsedRealtime(),"Coloca las manos dentro de la cámara");render()
+                if(debugOn){val now=SystemClock.elapsedRealtime();b.wordDebug.text="Cámara sin resultados hace ${now-lastResult}ms (descartados: $dropped)\n"+(engine?.debug(now,null) ?: "")}
             }
             b.root.postDelayed(this,100)
         }
@@ -69,6 +72,9 @@ class WordPracticeActivity:ComponentActivity() {
         b.wordCamera.implementationMode=PreviewView.ImplementationMode.COMPATIBLE
         // No ampliar 1.30: las palabras necesitan ver ambos brazos completos.
         b.wordBack.setOnClickListener{finish()}
+        b.wordTitle.setOnLongClickListener{
+            debugOn=!debugOn;b.wordDebug.visibility=if(debugOn)android.view.View.VISIBLE else android.view.View.GONE;true
+        }
         b.wordNext.setOnClickListener{
             val m=module ?: return@setOnClickListener
             if(!completed)return@setOnClickListener
@@ -115,7 +121,7 @@ class WordPracticeActivity:ComponentActivity() {
                     HandLandmarker.HandLandmarkerOptions.builder()
                         .setBaseOptions(BaseOptions.builder().setModelAssetPath("hand_landmarker.task").build())
                         .setRunningMode(RunningMode.VIDEO).setNumHands(2)
-                        .setMinHandDetectionConfidence(.45f).setMinHandPresenceConfidence(.45f).setMinTrackingConfidence(.45f).build())
+                        .setMinHandDetectionConfidence(.30f).setMinHandPresenceConfidence(.30f).setMinTrackingConfidence(.30f).build())
                 samples.reset()
                 val prepared=WordPracticeEngine(ref.keys,lesson.tolerance,true)
                 runOnUiThread {
@@ -179,11 +185,16 @@ class WordPracticeActivity:ComponentActivity() {
             val image=BitmapImageBuilder(frame).build()
             val result=try{model.detectForVideo(image,time)}finally{image.close()}
             val sample=samples.read(result,frame.width,frame.height,time)
+            val info=if(debugOn){
+                val conf=result.handedness().joinToString(" "){h -> h.firstOrNull()?.let{"${it.categoryName()} ${(it.score()*100).toInt()}%"} ?: "?"}
+                "MediaPipe: ${result.landmarks().size} mano(s) [$conf] -> válidas: ${sample.hands.size} (descartados: $dropped)\n"
+            } else ""
             runOnUiThread {
                 if(closing || !active || token!=generation || attempt!=session || !ready || !videoReady || completed)return@runOnUiThread
                 // No utilizar un resultado atrasado después de una pausa/carga fuerte de UI.
-                if(SystemClock.elapsedRealtime()-time>600)return@runOnUiThread
+                if(SystemClock.elapsedRealtime()-time>600){dropped++;return@runOnUiThread}
                 lastResult=time;engine?.update(time,sample);render()
+                if(debugOn)b.wordDebug.text=info+(engine?.debug(time,sample) ?: "")
             }
         }catch(e:Exception){
             android.util.Log.e("WordPractice","Error procesando cámara",e)

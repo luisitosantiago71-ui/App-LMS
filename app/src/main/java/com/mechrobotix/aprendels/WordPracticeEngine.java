@@ -26,6 +26,9 @@ public final class WordPracticeEngine {
     private int target=0;
     private long last=-1,hold=-1,began=-1,lost=-1;
     private Frame anchor,checkpoint,stable;
+    // --- DEBUG: solo lectura, no cambia el comportamiento ---
+    private String resetReason=null,blocker="";
+    private int resets=0;
     public WordPracticeEngine(List<Frame> keys,WordTolerance tolerance,boolean mirror) {
         if(keys==null || keys.size()<4)throw new IllegalArgumentException("Referencia de palabra incompleta");
         for(Frame f:keys)if(f==null || !f.valid())throw new IllegalArgumentException("Hito sin manos válidas");
@@ -45,6 +48,7 @@ public final class WordPracticeEngine {
     public int getTarget(){return target;}
     public int getKeyCount(){return keys.size();}
     public void reset(){stage=Stage.START;target=0;last=hold=began=lost=-1;anchor=checkpoint=stable=null;message="1/3 · Imita la postura inicial del video";}
+    private void resetBecause(String why){reset();resetReason=why;resets++;}
     private String side(String reference){return swap?(reference.equals("Left")?"Right":"Left"):reference;}
     private double direction(){return mirror?-1.0:1.0;}
     private JPracticeEngine.Sample hand(Frame f,String ref){return f.hands.get(side(ref));}
@@ -52,16 +56,19 @@ public final class WordPracticeEngine {
         if(stage==Stage.SUCCESS)return;
         hold=-1;stable=null;
         if(lost<0)lost=time;
-        if(time-lost>tolerance.lostGraceMs){reset();message=reason+". Comienza de nuevo";}
+        if(time-lost>tolerance.lostGraceMs){resetBecause("Sin manos > "+tolerance.lostGraceMs+"ms ("+reason+")");message=reason+". Comienza de nuevo";}
         else message=reason+". Recupera la postura para continuar";
     }
-    private double shape(JPracticeEngine.Sample a,JPracticeEngine.Sample r) {
+    private double[] shapeParts(JPracticeEngine.Sample a,JPracticeEngine.Sample r) {
         double sum=0,flex=0,max=0;
         for(int i=1;i<21;i++)sum+=Math.hypot(
             (a.points[i][0]-a.points[0][0])/palmSize(a)-direction()*(r.points[i][0]-r.points[0][0])/palmSize(r),
             (a.points[i][1]-a.points[0][1])/palmSize(a)-(r.points[i][1]-r.points[0][1])/palmSize(r));
         for(int i=0;i<10;i++){double d=Math.abs(a.flex[i]-r.flex[i]);flex+=d;max=Math.max(max,d);}
-        return Math.max(sum/20/tolerance.shape,Math.max(flex/10/tolerance.meanFlex,max/tolerance.maxFlex));
+        return new double[]{sum/20/tolerance.shape,flex/10/tolerance.meanFlex,max/tolerance.maxFlex};
+    }
+    private double shape(JPracticeEngine.Sample a,JPracticeEngine.Sample r){
+        double[] p=shapeParts(a,r);return Math.max(p[0],Math.max(p[1],p[2]));
     }
     private double score(Frame actual,Frame ref,boolean moving) {
         double score=0;
@@ -116,34 +123,67 @@ public final class WordPracticeEngine {
         }
         return true;
     }
+
+    /** DEBUG: texto con qué tan lejos está cada métrica de pasar. Valor <=1 pasa (OK), >1 falla (X). No modifica el estado. */
+    public String debug(long time,Frame actual) {
+        StringBuilder sb=new StringBuilder();
+        sb.append(stage).append("  hito ").append(target).append('/').append(keys.size()-1).append("  swap=").append(swap);
+        if(lost>=0)sb.append("  sinManos=").append(time-lost).append('/').append(tolerance.lostGraceMs).append("ms");
+        sb.append('\n');
+        if(!blocker.isEmpty())sb.append("Bloqueo: ").append(blocker).append('\n');
+        if(resetReason!=null)sb.append("Reinicios: ").append(resets).append(" | último: ").append(resetReason).append('\n');
+        if(stage==Stage.SUCCESS)return sb.toString();
+        if(actual==null || !actual.valid()){sb.append("SIN MANOS VALIDAS (MediaPipe no detectó o landmarks inválidos)");return sb.toString();}
+        boolean moving=stage!=Stage.START;
+        Frame ref=keys.get(Math.min(moving?target:0,keys.size()-1));
+        JPracticeEngine.Sample r0=keys.get(0).hands.get(primary);
+        JPracticeEngine.Sample a0=moving?(anchor==null?null:hand(anchor,primary)):hand(actual,primary);
+        for(Map.Entry<String,JPracticeEngine.Sample> e:ref.hands.entrySet()) {
+            JPracticeEngine.Sample a=hand(actual,e.getKey()),r=e.getValue();
+            if(a==null){sb.append("Falta mano ").append(e.getKey()).append(" (la seña la pide)\n");continue;}
+            double[] p=shapeParts(a,r);
+            sb.append(e.getKey()).append(" forma ").append(f(p[0])).append(" flexMedia ").append(f(p[1])).append(" flexMax ").append(f(p[2]));
+            if((moving || ref.hands.size()==2) && a0!=null && r0!=null) {
+                double rx=direction()*(r.points[0][0]-r0.points[0][0])/palmSize(r0),ry=(r.points[0][1]-r0.points[0][1])/palmSize(r0);
+                double ax=(a.points[0][0]-a0.points[0][0])/palmSize(a0),ay=(a.points[0][1]-a0.points[0][1])/palmSize(a0);
+                double margin=tolerance.travel+Math.min(.8,Math.hypot(rx,ry)*tolerance.travelRelative);
+                sb.append(" recorrido ").append(f(Math.hypot(ax-rx,ay-ry)/margin));
+            }
+            sb.append('\n');
+        }
+        sb.append("(<=1 pasa, >1 falla)");
+        return sb.toString();
+    }
+    private static String f(double v){return String.format(Locale.US,"%.2f%s",v,v>1?"X":"");}
     public void update(long time,Frame sample) {
         if(stage==Stage.SUCCESS)return;
+        blocker="";
         if(last>=0 && time<=last)return; // Un callback repetido no suma tiempo ni progreso.
         if(sample==null || !sample.valid()){missing(time,"Coloca las manos dentro de la cámara");return;}
-        if(last>=0 && time-last>tolerance.lostGraceMs){reset();message="Se perdió la continuidad. Repite desde el inicio";return;}
+        if(last>=0 && time-last>tolerance.lostGraceMs){resetBecause("Hueco entre frames > "+tolerance.lostGraceMs+"ms (cámara/UI lenta)");message="Se perdió la continuidad. Repite desde el inicio";return;}
         last=time;
         if(stage==Stage.START) {
             boolean oldSwap=swap;
             swap=false;double direct=score(sample,keys.get(0),false);
             swap=true;double other=score(sample,keys.get(0),false);
             swap=other<direct;
-            if(Math.min(direct,other)>1){hold=-1;stable=null;message="1/3 · Ajusta la postura inicial; imita el video como un espejo";return;}
+            if(Math.min(direct,other)>1){blocker="Postura inicial no coincide";hold=-1;stable=null;message="1/3 · Ajusta la postura inicial; imita el video como un espejo";return;}
             lost=-1;
             if(stable==null || oldSwap!=swap || change(stable,sample)>tolerance.stability){stable=sample;hold=time;}
             message="1/3 · Bien, mantén un momento el inicio";
             if(time-hold>=tolerance.startHoldMs){anchor=sample;checkpoint=sample;target=1;began=time;hold=-1;stable=null;stage=Stage.MOVE;message="2/3 · Ahora realiza la palabra completa";}
             return;
         }
-        if(time-began>tolerance.maxAttemptMs){reset();message="Vamos otra vez: comienza con la postura inicial";return;}
+        if(time-began>tolerance.maxAttemptMs){resetBecause("Pasaron "+tolerance.maxAttemptMs+"ms sin terminar la palabra");message="Vamos otra vez: comienza con la postura inicial";return;}
         Frame wanted=keys.get(target);
         if(wanted.hands.keySet().stream().anyMatch(s->hand(sample,s)==null)){
             missing(time,wanted.hands.size()==2?"Esta parte necesita las dos manos":"No se ve la mano de la seña");return;
         }
         // Una oclusión larga también reinicia aunque la otra mano siguiera visible.
-        if(lost>=0 && time-lost>tolerance.lostGraceMs){reset();message="Se perdió una mano. Repite desde el inicio";return;}
+        if(lost>=0 && time-lost>tolerance.lostGraceMs){resetBecause("Una mano desapareció > "+tolerance.lostGraceMs+"ms");message="Se perdió una mano. Repite desde el inicio";return;}
         lost=-1;
-        if(score(sample,wanted,true)>1){hold=-1;stable=null;message="2/3 · Sigue el movimiento del video ("+target+"/"+(keys.size()-1)+")";return;}
-        if(stage!=Stage.END && !motion(sample)){hold=-1;message="2/3 · Continúa el movimiento; no basta mantener la mano quieta";return;}
+        if(score(sample,wanted,true)>1){blocker="Forma/recorrido fuera de tolerancia";hold=-1;stable=null;message="2/3 · Sigue el movimiento del video ("+target+"/"+(keys.size()-1)+")";return;}
+        if(stage!=Stage.END && !motion(sample)){blocker="Movimiento insuficiente, dirección mala o no llegó al vértice";hold=-1;message="2/3 · Continúa el movimiento; no basta mantener la mano quieta";return;}
         if(target<keys.size()-1){checkpoint=sample;target++;hold=-1;stable=null;message="2/3 · Bien, continúa la palabra";return;}
         stage=Stage.END;
         if(stable==null || change(stable,sample)>tolerance.stability){stable=sample;hold=time;}
