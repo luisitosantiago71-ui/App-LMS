@@ -1,0 +1,166 @@
+REFERENCE	d_nos_vemos_manana	1000	9800	11
+REFERENCE	d_nos_vemos_pronto	2200	10400	12
+REFERENCE	d_nos_vemos_proxima	2100	10200	13
+REFERENCE	f_abuela	1900	5100	7
+REFERENCE	f_abuelo	2400	5900	8
+REFERENCE	f_companera	1900	8100	12
+REFERENCE	f_companero	2000	6700	10
+REFERENCE	f_cunada	100	4200	8
+REFERENCE	f_cunado	100	1700	6
+REFERENCE	f_divorciado	2300	5900	7
+REFERENCE	f_esposa	1700	5100	8
+REFERENCE	f_esposo	1900	3200	4
+REFERENCE	f_familia	2000	5800	8
+REFERENCE	f_hermana	2300	8200	12
+REFERENCE	f_hermano	1400	5900	6
+REFERENCE	f_hija	1800	6300	9
+REFERENCE	f_hijo	2000	4900	6
+REFERENCE	f_hombre	1200	5100	7
+REFERENCE	f_joven	2700	8400	12
+REFERENCE	f_mama	2700	5700	5
+REFERENCE	f_mujer	1800	3400	5
+REFERENCE	f_nieta	2300	9400	12
+REFERENCE	f_nieto	1200	4900	9
+REFERENCE	f_nina	1500	6400	9
+REFERENCE	f_nino	1900	4700	4
+REFERENCE	f_novia	2000	6100	8
+REFERENCE	f_novio	1300	5200	8
+REFERENCE	f_nuera	100	2400	6
+REFERENCE	f_papa	1800	4200	4
+REFERENCE	f_prima	2500	7700	12
+REFERENCE	f_primo	2600	6300	10
+REFERENCE	f_sobrina	2000	7900	10
+REFERENCE	f_sobrino	400	4200	8
+REFERENCE	f_tia	2000	8100	11
+REFERENCE	f_tio	2200	6600	10
+REFERENCE	f_yerno	100	3000	7
+REFERENCE	s_buenas_noches	300	6000	11
+REFERENCE	s_buenas_tardes	3000	13500	14
+REFERENCE	s_buenos_dias	1400	9500	12
+REFERENCE	s_como_estas	1500	9900	13
+REFERENCE	s_hola	100	2900	6
+REFERENCE	s_yo_bien	1000	3900	6
+REFERENCE	s_yo_mal	600	3300	6
+RESULT	d_nos_vemos_manana	SUCCESS	SUCCESS	SUCCESS	MOVE	START	MOVE
+RESULT	d_nos_vemos_pronto	SUCCESS	SUCCESS	SUCCESS	MOVE	START	MOVE
+RESULT	d_nos_vemos_proxima	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	f_abuela	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	f_abuelo	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	f_companera	SUCCESS	SUCCESS	SUCCESS	MOVE	START	MOVE
+RESULT	f_companero	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_cunada	SUCCESS	SUCCESS	SUCCESS	MOVE	START	MOVE
+RESULT	f_cunado	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	f_divorciado	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_esposa	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	f_esposo	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_familia	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_hermana	SUCCESS	SUCCESS	SUCCESS	MOVE	START	END
+RESULT	f_hermano	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_hija	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	f_hijo	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	POSE
+RESULT	f_hombre	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	SUCCESS
+RESULT	f_joven	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_mama	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_mujer	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_nieta	SUCCESS	SUCCESS	SUCCESS	MOVE	START	POSE
+RESULT	f_nieto	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	f_nina	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	POSE
+RESULT	f_nino	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	SUCCESS
+RESULT	f_novia	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_novio	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	SUCCESS
+RESULT	f_nuera	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_papa	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	SUCCESS
+RESULT	f_prima	SUCCESS	SUCCESS	SUCCESS	MOVE	START	POSE
+RESULT	f_primo	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	f_sobrina	SUCCESS	SUCCESS	SUCCESS	MOVE	START	POSE
+RESULT	f_sobrino	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	f_tia	SUCCESS	SUCCESS	SUCCESS	MOVE	START	POSE
+RESULT	f_tio	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	f_yerno	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	s_buenas_noches	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	s_buenas_tardes	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	s_buenos_dias	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	POSE
+RESULT	s_como_estas	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	s_hola	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	s_yo_bien	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	POSE
+RESULT	s_yo_mal	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	POSE
+CROSS	f_abuela	f_abuelo
+CROSS	f_abuelo	f_abuela
+CROSS	f_companero	f_companera
+CROSS	f_cunado	f_cunada
+CROSS	f_cunado	f_yerno
+CROSS	f_esposo	f_cunada
+CROSS	f_esposo	f_esposa
+CROSS	f_esposo	f_hermana
+CROSS	f_esposo	f_hermano
+CROSS	f_esposo	f_primo
+CROSS	f_familia	f_companera
+CROSS	f_hermano	f_hermana
+CROSS	f_hijo	f_hija
+CROSS	f_hombre	d_nos_vemos_manana
+CROSS	f_hombre	d_nos_vemos_pronto
+CROSS	f_hombre	f_divorciado
+CROSS	f_hombre	f_hijo
+CROSS	f_hombre	f_mama
+CROSS	f_hombre	f_nino
+CROSS	f_hombre	f_primo
+CROSS	f_hombre	f_yerno
+CROSS	f_hombre	s_buenas_noches
+CROSS	f_hombre	s_como_estas
+CROSS	f_hombre	s_yo_bien
+CROSS	f_mama	d_nos_vemos_pronto
+CROSS	f_mama	f_esposo
+CROSS	f_mama	f_hombre
+CROSS	f_mama	f_joven
+CROSS	f_mama	f_nino
+CROSS	f_mama	f_yerno
+CROSS	f_mama	s_como_estas
+CROSS	f_nieto	s_como_estas
+CROSS	f_nina	f_hermana
+CROSS	f_nino	f_hombre
+CROSS	f_nino	f_nina
+CROSS	f_nino	f_papa
+CROSS	f_nino	f_prima
+CROSS	f_nino	f_tio
+CROSS	f_nino	f_yerno
+CROSS	f_nino	s_buenas_noches
+CROSS	f_nino	s_como_estas
+CROSS	f_nino	s_yo_bien
+CROSS	f_novia	f_novio
+CROSS	f_novia	f_prima
+CROSS	f_novia	f_sobrina
+CROSS	f_novia	f_sobrino
+CROSS	f_novia	f_tia
+CROSS	f_novia	f_tio
+CROSS	f_novio	f_abuelo
+CROSS	f_novio	f_divorciado
+CROSS	f_novio	f_novia
+CROSS	f_novio	f_prima
+CROSS	f_novio	f_primo
+CROSS	f_novio	f_sobrina
+CROSS	f_novio	f_sobrino
+CROSS	f_novio	f_tia
+CROSS	f_papa	f_divorciado
+CROSS	f_papa	f_hombre
+CROSS	f_papa	f_joven
+CROSS	f_papa	f_nina
+CROSS	f_papa	f_nino
+CROSS	f_papa	f_primo
+CROSS	f_papa	s_hola
+CROSS	f_papa	s_yo_bien
+CROSS	f_primo	f_prima
+CROSS	f_sobrino	f_sobrina
+CROSS	f_sobrino	f_tia
+CROSS	f_tio	f_tia
+CROSS	s_como_estas	f_prima
+CROSS	s_como_estas	f_primo
+CROSS	s_yo_bien	f_companera
+CROSS	s_yo_bien	f_companero
+CROSS	s_yo_bien	f_joven
+CROSS	s_yo_bien	s_buenas_noches
+CROSS	s_yo_bien	s_buenas_tardes
+CROSS	s_yo_bien	s_buenos_dias
+CROSS	s_yo_mal	d_nos_vemos_proxima
+CROSS	s_yo_mal	f_joven
+CROSS	s_yo_mal	s_buenas_tardes
+SUMMARY	43	0	79	1806

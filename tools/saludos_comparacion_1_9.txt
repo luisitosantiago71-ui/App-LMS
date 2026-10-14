@@ -1,0 +1,29 @@
+Catálogo Saludos: idéntico al RAR recibido.
+Salida del motor original y actualizado: idéntica.
+
+REFERENCE	d_nos_vemos_manana	1000	9800	11
+REFERENCE	d_nos_vemos_pronto	2200	10400	12
+REFERENCE	d_nos_vemos_proxima	2100	10200	13
+REFERENCE	s_buenas_noches	300	6000	11
+REFERENCE	s_buenas_tardes	3000	13500	14
+REFERENCE	s_buenos_dias	1400	9500	12
+REFERENCE	s_como_estas	1500	9900	13
+REFERENCE	s_hola	100	2900	6
+REFERENCE	s_yo_bien	1000	3900	6
+REFERENCE	s_yo_mal	600	3300	6
+RESULT	d_nos_vemos_manana	SUCCESS	SUCCESS	SUCCESS	MOVE	START	MOVE
+RESULT	d_nos_vemos_pronto	SUCCESS	SUCCESS	SUCCESS	MOVE	START	MOVE
+RESULT	d_nos_vemos_proxima	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	s_buenas_noches	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	s_buenas_tardes	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	s_buenos_dias	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	POSE
+RESULT	s_como_estas	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	END
+RESULT	s_hola	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	MOVE
+RESULT	s_yo_bien	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	POSE
+RESULT	s_yo_mal	SUCCESS	SUCCESS	SUCCESS	MOVE	MOVE	POSE
+CROSS	s_yo_bien	s_buenas_noches
+CROSS	s_yo_bien	s_buenas_tardes
+CROSS	s_yo_bien	s_buenos_dias
+CROSS	s_yo_mal	d_nos_vemos_proxima
+CROSS	s_yo_mal	s_buenas_tardes
+SUMMARY	10	0	5	90

@@ -1,3 +1,5 @@
+> Documento de la versión anterior. Para etapas y tolerancias vigentes consulta GUIA_SALUDOS_POR_ETAPAS.md e INFORME_PRUEBAS_ETAPAS.md.
+
 # Referencias automáticas y tolerancias — versión 1.6
 
 ## Lo que cambia

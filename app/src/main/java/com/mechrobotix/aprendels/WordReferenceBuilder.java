@@ -4,8 +4,9 @@ import java.util.*;
 
 /** Selección automática de hitos; Java puro para probarlo sin teléfono. */
 public final class WordReferenceBuilder {
-    // Incrementar VERSION al cambiar selección, muestreo, seguimiento o formato.
-    public static final int VERSION = 1;
+    // VERSION conserva el perfil histórico; el perfil fino tiene versión e identidad independientes.
+    public static final int VERSION = 2;
+    public static final int SPARSE_VERSION = 1;
     public static final int STEP_MS = 100;
     public static final int MAX_GAP_MS = 700;
     public static final int MAX_VIDEO_MS = 60000;
@@ -22,6 +23,11 @@ public final class WordReferenceBuilder {
     }
 
     public static Result build(List<WordPracticeEngine.Frame> frames, long durationMs) {
+        return build(frames,durationMs,false);
+    }
+
+    /** Perfil opcional para movimientos finos. Conserva la selección histórica por defecto. */
+    public static Result build(List<WordPracticeEngine.Frame> frames, long durationMs, boolean recoverSparseMotion) {
         require(durationMs>=1000 && durationMs<=MAX_VIDEO_MS,"Usa un video de 1 a 60 segundos con una sola seña");
         long previous=-1;
         List<WordPracticeEngine.Frame> visible=new ArrayList<>();
@@ -33,6 +39,22 @@ public final class WordReferenceBuilder {
         long start=visible.get(0).timeMs,end=visible.get(visible.size()-1).timeMs;
         List<WordPracticeEngine.Frame> selected=new ArrayList<>();
         for(WordPracticeEngine.Frame f:frames)if(f.timeMs>=start && f.timeMs<=end && f.valid())selected.add(f);
+        // Evitar tomar el primer/último cuadro de entrada o retirada de las manos como postura.
+        int firstStable=-1,lastStable=-1;
+        for(int i=0;i+2<selected.size();i++) {
+            FrameWindowCheck:
+            if(selected.get(i+2).timeMs-selected.get(i).timeMs>=200 &&
+               selected.get(i+2).timeMs-selected.get(i).timeMs<=400) {
+                for(int k=i+1;k<=i+2;k++)if(!selected.get(i).hands.keySet().equals(selected.get(k).hands.keySet()) ||
+                    WordPracticeEngine.change(selected.get(i),selected.get(k))>.25)break FrameWindowCheck;
+                if(firstStable<0)firstStable=i+1;
+                lastStable=i+1;
+            }
+        }
+        if(firstStable>=0 && lastStable>firstStable && selected.get(lastStable).timeMs-selected.get(firstStable).timeMs>=900) {
+            selected=new ArrayList<>(selected.subList(firstStable,lastStable+1));
+            start=selected.get(0).timeMs;end=selected.get(selected.size()-1).timeMs;
+        }
         require(end-start>=900,"La seña visible es demasiado corta; deja un momento al inicio y al final");
         int gap=0;
         double[] lengths=new double[selected.size()];
@@ -68,6 +90,21 @@ public final class WordReferenceBuilder {
         if(lastKey.timeMs!=last.timeMs) {
             if(lastKey.hands.keySet().equals(last.hands.keySet()) && WordPracticeEngine.change(lastKey,last)<.13)keys.set(keys.size()-1,last);
             else keys.add(last);
+        }
+        if(recoverSparseMotion && keys.size()<4) {
+            // Recuperar cuadros reales descartados por el umbral de deduplicación .13.
+            // No interpolar, duplicar ni inventar movimiento para alcanzar cuatro hitos.
+            while(keys.size()<4) {
+                WordPracticeEngine.Frame best=null;double bestDifference=.02;
+                for(WordPracticeEngine.Frame candidate:selected) {
+                    if(keys.stream().anyMatch(k->k.timeMs==candidate.timeMs))continue;
+                    double difference=Double.POSITIVE_INFINITY;
+                    for(WordPracticeEngine.Frame key:keys)difference=Math.min(difference,WordPracticeEngine.change(key,candidate));
+                    if(difference>bestDifference){bestDifference=difference;best=candidate;}
+                }
+                if(best==null)break;
+                keys.add(best);keys.sort(Comparator.comparingLong(f->f.timeMs));
+            }
         }
         require(keys.size()>=4,"No se distinguen al menos cuatro hitos; usa un video de la palabra completa");
         String primary=null;int most=-1;

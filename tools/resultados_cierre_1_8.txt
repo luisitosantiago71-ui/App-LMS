@@ -1,0 +1,25 @@
+d_nos_vemos_manana stages=6 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+d_nos_vemos_pronto stages=6 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+d_nos_vemos_proxima stages=6 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+s_buenas_noches stages=5 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+s_buenas_tardes stages=5 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+s_buenos_dias stages=5 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+s_como_estas stages=5 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+s_hola stages=3 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+s_yo_bien stages=4 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+CONFUSION s_yo_bien <- s_buenas_noches
+CONFUSION s_yo_bien <- s_buenas_tardes
+CONFUSION s_yo_bien <- s_buenos_dias
+s_yo_mal stages=4 exact=SUCCESS flexible=SUCCESS fast=SUCCESS
+CONFUSION s_yo_mal <- d_nos_vemos_proxima
+CONFUSION s_yo_mal <- s_buenas_tardes
+FIRST_SUCCESS d_nos_vemos_manana videoMs=5100
+CLOSURE d_nos_vemos_manana interrupted rejected=9/9
+FIRST_SUCCESS d_nos_vemos_pronto videoMs=9500
+CLOSURE d_nos_vemos_pronto interrupted rejected=11/11
+FIRST_SUCCESS d_nos_vemos_proxima videoMs=9400
+CLOSURE d_nos_vemos_proxima interrupted rejected=10/10
+Premature acceptances=0/30
+Reversed acceptances=0/10
+Positive failures=0/30; cross-word=5/90
+PASS: variants, stationary, skipped movement, required hands, duplicate timestamps, tracking loss.

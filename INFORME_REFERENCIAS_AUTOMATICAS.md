@@ -1,3 +1,5 @@
+> Documento de la versión anterior. Para etapas y tolerancias vigentes consulta GUIA_SALUDOS_POR_ETAPAS.md e INFORME_PRUEBAS_ETAPAS.md.
+
 # Informe de pruebas — referencias automáticas 1.6
 
 Base recibida: `AprendeLS_Modulos_Palabras(1).zip`. Ejecución: 30 de septiembre de 2026 (America/Ciudad_Juarez).

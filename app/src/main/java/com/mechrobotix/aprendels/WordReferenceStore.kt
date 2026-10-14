@@ -38,15 +38,17 @@ object WordReferenceStore {
             WordVideoReferenceGenerator.checkCancelled(cancelled)
             val saved=try {
                 cache.openRead().bufferedReader().use{JSONObject(it.readText())}.let { json ->
-                    if(matches(json,lesson.videoName,videoHash,model))decode(json) else null
+                    if(matches(json,lesson.videoName,videoHash,model,lesson.recoverSparseMotion))decode(json) else null
                 }
             }catch(_:Exception){null}
             if(saved!=null)return saved
             onProgress(0)
-            val result=WordVideoReferenceGenerator.generate(context,video,cancelled,onProgress)
+            val result=WordVideoReferenceGenerator.generate(context,video,cancelled,onProgress,lesson.recoverSparseMotion)
             WordVideoReferenceGenerator.checkCancelled(cancelled)
             val ref=Reference(result.keys,result.startMs,result.endMs)
             val json=encode(ref,lesson.videoName,videoHash,model)
+                .put("recoverSparseMotion",lesson.recoverSparseMotion)
+                .put("sparseGenerator",if(lesson.recoverSparseMotion)WordReferenceBuilder.SPARSE_VERSION else 0)
                 .put("sampledFrames",result.sampledFrames).put("largestGapMs",result.largestGapMs)
             // Un cierre durante la escritura no deja medio JSON publicado.
             val bytes=json.toString().toByteArray(Charsets.UTF_8)
@@ -59,8 +61,10 @@ object WordReferenceStore {
         }finally{video.delete()}
     }
 
-    private fun matches(json:JSONObject,name:String,videoHash:String,model:String)=
-        json.optInt("schema")==2 && json.optInt("generator")==WordReferenceBuilder.VERSION &&
+    private fun matches(json:JSONObject,name:String,videoHash:String,model:String,recoverSparseMotion:Boolean)=
+        json.optBoolean("recoverSparseMotion",false)==recoverSparseMotion &&
+            json.optInt("sparseGenerator",0)==(if(recoverSparseMotion)WordReferenceBuilder.SPARSE_VERSION else 0) &&
+            json.optInt("schema")==2 && json.optInt("generator")==WordReferenceBuilder.VERSION &&
             json.optString("video")==name && json.optString("sha256")==videoHash && json.optString("modelSha256")==model
 
     private fun decode(json:JSONObject):Reference {

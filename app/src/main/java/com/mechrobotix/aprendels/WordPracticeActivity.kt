@@ -43,6 +43,8 @@ class WordPracticeActivity:ComponentActivity() {
     private var videoReady=false
     private var cameraReady=false
     private var completed=false
+    // Deja leer el mensaje de éxito antes de cargar la siguiente palabra.
+    private val autoAdvance=WordAutoAdvance(3000L)
     private var lastResult=0L
     private var lastInference=0L // worker exclusivamente.
     private val permission=registerForActivityResult(ActivityResultContracts.RequestPermission()){granted ->
@@ -58,7 +60,8 @@ class WordPracticeActivity:ComponentActivity() {
             if(ready && videoReady && cameraReady && !completed && SystemClock.elapsedRealtime()-lastResult>600){
                 engine?.missing(SystemClock.elapsedRealtime(),"Coloca las manos dentro de la cámara");render()
             }
-            b.root.postDelayed(this,100)
+            if(completed && autoAdvance.take(SystemClock.elapsedRealtime()))advanceLesson()
+            if(!isFinishing)b.root.postDelayed(this,100)
         }
     }
     override fun onCreate(savedInstanceState:Bundle?) {
@@ -69,17 +72,13 @@ class WordPracticeActivity:ComponentActivity() {
         b.wordCamera.implementationMode=PreviewView.ImplementationMode.COMPATIBLE
         // No ampliar 1.30: las palabras necesitan ver ambos brazos completos.
         b.wordBack.setOnClickListener{finish()}
-        b.wordNext.setOnClickListener{
-            val m=module ?: return@setOnClickListener
-            if(!completed)return@setOnClickListener
-            if(index<m.lessons.lastIndex){index++;loadLesson()}else finish()
-        }
+        b.wordNext.setOnClickListener{advanceLesson()}
         b.wordReplay.setOnClickListener{
             if(preparing)return@setOnClickListener
             if(!hasCameraPermission()){permission.launch(Manifest.permission.CAMERA);return@setOnClickListener}
             if(!cameraReady)startCamera()
             if(!ready || !videoReady){loadLesson();return@setOnClickListener}
-            session++;engine?.reset();completed=false;b.wordNext.isEnabled=false
+            autoAdvance.reset();session++;engine?.reset();completed=false;b.wordNext.isEnabled=false
             b.wordVideo.seekTo(reference?.startMs ?: 0);b.wordVideo.start();render()
         }
         try {
@@ -91,9 +90,16 @@ class WordPracticeActivity:ComponentActivity() {
             if(hasCameraPermission())startCamera() else permission.launch(Manifest.permission.CAMERA)
         }catch(e:Exception){b.wordStatus.text="No se pudo abrir el módulo: ${e.message}"}
     }
+    private fun advanceLesson() {
+        val m=module ?: return
+        if(!active || !completed || isFinishing)return
+        autoAdvance.reset()
+        if(index<m.lessons.lastIndex){index++;loadLesson()}else finish()
+    }
     private fun hasCameraPermission()=ContextCompat.checkSelfPermission(this,Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED
     private fun loadLesson() {
         val m=module ?: return
+        autoAdvance.reset()
         val lesson=m.lessons[index];val token=++generation;session++
         ready=false;preparing=true;completed=false;videoReady=false;reference=null;engine=null
         b.wordReplay.isEnabled=false;b.wordStatus.setTextColor(Color.WHITE)
@@ -116,8 +122,8 @@ class WordPracticeActivity:ComponentActivity() {
                         .setBaseOptions(BaseOptions.builder().setModelAssetPath("hand_landmarker.task").build())
                         .setRunningMode(RunningMode.VIDEO).setNumHands(2)
                         .setMinHandDetectionConfidence(.45f).setMinHandPresenceConfidence(.45f).setMinTrackingConfidence(.45f).build())
-                samples.reset()
-                val prepared=WordPracticeEngine(ref.keys,lesson.tolerance,true)
+                samples.reset();samples.retentionMs=lesson.tolerance.lostGraceMs
+                val prepared=WordPracticeEngine(ref.keys,lesson.tolerance,true,lesson.validation)
                 runOnUiThread {
                     if(closing || generation!=token)return@runOnUiThread
                     reference=ref;engine=prepared;ready=true;preparing=false;b.wordReplay.isEnabled=true;lastResult=SystemClock.elapsedRealtime()
@@ -129,7 +135,7 @@ class WordPracticeActivity:ComponentActivity() {
                     }
                     b.wordVideo.setOnCompletionListener{if(active && generation==token){b.wordVideo.seekTo(ref.startMs);b.wordVideo.start()}}
                     b.wordVideo.setOnErrorListener{_,_,_ ->
-                        if(generation==token){videoReady=false;ready=false;engine?.reset();b.wordNext.isEnabled=false
+                        if(generation==token){autoAdvance.reset();completed=false;videoReady=false;ready=false;engine?.reset();b.wordNext.isEnabled=false
                             b.wordStatus.text="No se pudo reproducir el ejemplo. Toca Reintentar.";b.wordReplay.text="Reintentar"};true
                     }
                     b.wordVideo.setVideoURI(Uri.parse("android.resource://$packageName/${lesson.video}"))
@@ -147,6 +153,7 @@ class WordPracticeActivity:ComponentActivity() {
         completed=e.stage==WordPracticeEngine.Stage.SUCCESS
         b.wordProgress.progress=e.progress;b.wordNext.isEnabled=completed
         b.wordStatus.text=if(completed)"¡${module!!.lessons[index].title}: palabra completada!" else e.message
+        if(completed && active)autoAdvance.completed(SystemClock.elapsedRealtime())
         b.wordStatus.setTextColor(if(completed)Color.rgb(185,246,202) else Color.WHITE)
     }
     private fun startCamera() {
@@ -206,14 +213,14 @@ class WordPracticeActivity:ComponentActivity() {
         return Bitmap.createBitmap(base,0,0,w,h,Matrix().apply{postRotate(rotation.toFloat())},true).also{if(it!==base)base.recycle()}
     }
     override fun onResume(){
-        super.onResume();active=true;session++;engine?.reset();completed=false;b.wordNext.isEnabled=false;b.wordProgress.progress=0
+        super.onResume();autoAdvance.reset();active=true;session++;engine?.reset();completed=false;b.wordNext.isEnabled=false;b.wordProgress.progress=0
         if(videoReady){b.wordVideo.seekTo(reference?.startMs ?: 0);b.wordVideo.start()}
         if(ready)render();b.root.removeCallbacks(tick);b.root.post(tick)
     }
-    override fun onPause(){active=false;session++;b.root.removeCallbacks(tick);b.wordVideo.pause();engine?.reset();super.onPause()}
+    override fun onPause(){autoAdvance.reset();active=false;session++;b.root.removeCallbacks(tick);b.wordVideo.pause();engine?.reset();super.onPause()}
     override fun onSaveInstanceState(outState:Bundle){outState.putInt("word_index",index);super.onSaveInstanceState(outState)}
     override fun onDestroy(){
-        closing=true;generation++;b.root.removeCallbacks(tick);b.wordVideo.stopPlayback()
+        autoAdvance.reset();closing=true;generation++;b.root.removeCallbacks(tick);b.wordVideo.stopPlayback()
         analysis?.clearAnalyzer();provider?.unbindAll()
         worker.execute{detector?.close();detector=null};worker.shutdown();super.onDestroy()
     }

@@ -32,6 +32,13 @@ class WordAutoReferenceTest {
             WordReferenceStore.loadOrGenerate(context,replaced,onProgress={progress++})
             assertTrue(progress>0);assertFalse(oldBytes.contentEquals(cache.readBytes()))
             assertArrayEquals(otherBytes,untouched.readBytes())
+            // Cambiar el perfil invalida solo esta referencia; el resto sigue intacto.
+            progress=0
+            val fine=replaced.copy(recoverSparseMotion=true)
+            WordReferenceStore.loadOrGenerate(context,fine,onProgress={progress++})
+            assertTrue(progress>0)
+            WordReferenceStore.loadOrGenerate(context,fine,onProgress={fail("No reutilizó el perfil fino")})
+            assertArrayEquals(otherBytes,untouched.readBytes())
             val validBytes=cache.readBytes()
             try {
                 var cancel=false

@@ -8,6 +8,7 @@ import kotlin.math.*
  * Debe utilizarse exclusivamente desde el ejecutor de cámara.
  */
 class WordHandSamples(private val mirrorX:Boolean=true) {
+    var retentionMs:Long=1100 // Cámara: mismo margen de recuperación que la palabra.
     private val previous=mutableMapOf<String,Pair<Long,JPracticeEngine.Sample>>()
     fun reset(){previous.clear()}
     fun read(result:HandLandmarkerResult,width:Int,height:Int,time:Long):WordPracticeEngine.Frame {
@@ -30,7 +31,7 @@ class WordHandSamples(private val mirrorX:Boolean=true) {
             val sample=JPracticeEngine.Sample(points,flex,label)
             if(sample.valid() && WordPracticeEngine.palmSize(sample)>=8)detected.add(label to sample)
         }
-        val recent=previous.filterValues{time-it.first<=1100}
+        val recent=previous.filterValues{time-it.first<=retentionMs}
         val assignments=if(detected.size==2)listOf(listOf("Left","Right"),listOf("Right","Left"))
             else if(detected.size==1)listOf(listOf("Left"),listOf("Right")) else listOf(emptyList())
         val chosen=assignments.minByOrNull{assignment ->

@@ -15,7 +15,7 @@ import java.util.concurrent.CancellationException
 object WordVideoReferenceGenerator {
     const val MODEL_ASSET="hand_landmarker.task"
     const val CONFIDENCE=.45f
-    fun generate(context:Context,video:File,cancelled:()->Boolean,onProgress:(Int)->Unit):WordReferenceBuilder.Result {
+    fun generate(context:Context,video:File,cancelled:()->Boolean,onProgress:(Int)->Unit,recoverSparseMotion:Boolean=false):WordReferenceBuilder.Result {
         val retriever=MediaMetadataRetriever()
         var detector:HandLandmarker?=null
         try {
@@ -62,7 +62,7 @@ object WordVideoReferenceGenerator {
                 time+=WordReferenceBuilder.STEP_MS
             }
             checkCancelled(cancelled)
-            return WordReferenceBuilder.build(frames,duration)
+            return WordReferenceBuilder.build(frames,duration,recoverSparseMotion)
         } finally {
             try{detector?.close()}finally{retriever.release()}
         }
